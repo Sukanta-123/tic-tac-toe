@@ -5,7 +5,7 @@ let msgContainer = document.querySelector(".msg-container");
 let msg = document.querySelector("#msg");
 
 let turnO = true; //playerX, playerO
-
+let count = 0;
 // 2D array
 // let arr = [
 //   ["apple", "litchi"],
@@ -26,9 +26,26 @@ const winPatterns = [
 
 const resetGame = () => {
   turnO = true;
+  count = 0;
   enabledBoxes();
   msgContainer.classList.add("hide");
-  resetBtn.innerText = 'Reset'
+  resetBtn.innerText = "Reset";
+};
+// AI move
+const computerMove = () => {
+  let emptyBoxes = [];
+  boxes.forEach((box) => {
+    if ((box.innerText = "")) {
+      emptyBoxes.push(box);
+    }
+  });
+
+  if (emptyBoxes.length > 0 && msgContainer.classList.contains("hide")) {
+    let randomIndex = Math.floor(Math.random() * emptyBoxes.length);
+    let randomBox = emptyBoxes[randomIndex];
+
+    randomBox.click();
+  }
 };
 
 boxes.forEach((box) => {
@@ -44,10 +61,25 @@ boxes.forEach((box) => {
       box.style.color = "red";
     }
     box.disabled = true;
+    count++;
 
-    checkWinner();
+    let isWinner = checkWinner();
+
+    if (count === 9 && !isWinner) {
+      gameDraw();
+    }
+
+    if (!turnO && !isWinner && count < 9) {
+      setTimeout(computerMove, 500);
+    }
   });
 });
+
+const gameDraw = ()=>{
+  msg.innerText ='Game was a Draw'
+  msgContainer.classList.remove('hide')
+  disabledBoxes()
+}
 
 const disabledBoxes = () => {
   for (let box of boxes) {
@@ -78,11 +110,12 @@ const checkWinner = () => {
     if (pos1Val != "" && pos2Val != "" && pos3Val != "") {
       if (pos1Val === pos2Val && pos2Val === pos3Val) {
         showWinner(pos1Val);
+        return true
       }
     }
   }
+  return false
 };
 
 newGameBtn.addEventListener("click", resetGame);
 resetBtn.addEventListener("click", resetGame);
-
